@@ -1,0 +1,52 @@
+.body{
+    position: relative;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.4;
+
+    min-width: 320px;
+    overflow-x: hidden;
+    height: 700vh;
+}
+
+.title{
+    text-align: center;
+}
+
+.top-container{
+    padding-top: 10%;
+}
+
+.general-container{
+    background-image: url("img/1.jpg");
+    height: 100%;
+    color: white;
+    font-weight: 100;
+}
+
+.general-container form{
+    margin-top: 30px;
+}
+
+.general-container form label{
+    font-weight: 100;
+}
+
+.button{
+    font-size: revert;
+}
+
+.btn-blue{
+    background-color: #42bfc2;
+    color: #fff;
+
+}
+
+.btn-blue:hover{
+    background-color: #2c888b;
+
+}
+
+.form-group{
+margin-right:10px;
+}

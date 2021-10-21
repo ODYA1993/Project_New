@@ -1,0 +1,43 @@
+{% load menu %}
+
+<nav class="navbar navbar-expand-lg navbar-main">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">Главная</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        {% show_menu %}
+
+
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                {% if not request.user.is_authenticated %}
+                <li>
+                    <a class="nav-link" href="{% url 'login' %}">Авторизация</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{% url 'registration' %}">Регистрация</a>
+                </li>
+                {% endif %}
+                <li class="navbar-nav">
+                    {% if request.user.is_authenticated %}
+                    <span class="navbar text">Привет, <span
+                            class="badge badge-danger">
+                    <a style="text-decoration: none; font-size: 14px;" href="{% url 'profile' %}">{{ request.user.username }}</a>
+                </span> | <a href="{% url 'logout' %}" style="color:black; text-decoration:none;">Выйти</a></span>
+                    {% endif %}
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <div class="basket-container">
+                        <a href="{% url 'cart' %}" style="color:black; text-decoration:none;">Корзина <span
+                                class="badge badge-pill badge-banger">{% if cart.products.count %}{{ cart.products.count }} шт.{% endif %}</span></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

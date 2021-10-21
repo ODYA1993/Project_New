@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %} {{ name }} {% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center"></h1>
+    <div class="row">
+        {% for category in categories %}
+        <div class="col-lg-3 col-sm-6 mb-3">
+            <div class="product-cart">
+                <div class="image-img">
+                    <a href="{{ category.get_absolute_url }}">
+                        <img src="{{ category.image.url }}" class="product_image">
+                    </a>
+                </div>
+                <div class="product-details">
+                    <a href="{{ category.get_absolute_url }}">
+                        <h5>{{category.name}}</h5>
+                    </a>
+                    <div class="product-bottom-details d-flex justify-content-between">
+                        <div class="product-price1">
+                            <small>{{ category.price }} руб.</small>
+                        </div>
+                        <div class="product-links">
+                            <a href="{% url 'add_to_cart' slug=category.slug %}">
+                                <button class="add-to-cart btn btn-success">В корзину</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

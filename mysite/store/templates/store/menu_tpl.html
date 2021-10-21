@@ -1,0 +1,36 @@
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ product.get_absolute_url }}">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+                Категории товаров
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for category in categories %}
+                <li><a class="dropdown-item" href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+
+    </ul>
+
+    <form action="{% url 'search' %}" method="get">
+        <input class="form-control mr-sm-5" type="search" placeholder="Поиск" aria-label="Search" name="q">
+    </form>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+

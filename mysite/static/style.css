@@ -102,8 +102,7 @@ h1.text-center{
 
 .basket-container{
     position: relative;
-    width: 200px;
-    padding: 15px 10px;
+    padding: 15px 80px;
 }
 
 .basket-items{
@@ -211,12 +210,21 @@ a:hover {
     text-decoration:none !important;
 }
 
-.page {
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
 footer {
     margin-top: auto;
+}
+
+.table {
+    margin-left: 20%;
+    margin-right: 20%;
+}
+
+.row1 {
+    flex-wrap: wrap;
+    margin-right: 315px;
+    margin-left: -210px;
+}
+
+.navbar.text {
+    margin-left: 24px;
 }

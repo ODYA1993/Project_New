@@ -1,17 +1,18 @@
 from django.db import transaction
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.views.generic import ListView, DetailView, View, CreateView
+from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.views.generic import ListView, DetailView, View
 from .utils import recalc_cart
 from .mixins import CartMixin
-from .models import Customer, Product, Category, Cart, CartProduct, Order
-from django.shortcuts import render, get_object_or_404, redirect
-from .forms import CustomerForms, OrderForm, LoginForm, RegistrationForm
+
+from .models import Customer, Product, Category, CartProduct, Order
+from django.shortcuts import render, redirect
+from .forms import OrderForm, LoginForm, RegistrationForm
 from django.contrib.auth import authenticate, login
 from django.db.models import Q
 
 
 class LoginView(CartMixin, View):
+    """Авторизация пользователя"""
     def get(self, request, *args, **kwargs):
         form = LoginForm(request.POST or None)
         categories = Category.objects.all()
@@ -32,6 +33,7 @@ class LoginView(CartMixin, View):
 
 
 class RegistrationView(CartMixin, View):
+    """Регистрация пользователя"""
     def get(self, request, *args, **kwargs):
         form = RegistrationForm(request.POST or None)
         categories = Category.objects.all()
@@ -62,7 +64,7 @@ class RegistrationView(CartMixin, View):
 
 
 class ProfileView(CartMixin, View):
-
+    """профиль пользователя"""
     def get(self, request, *args, **kwargs):
         customer = Customer.objects.get(user=request.user)
         orders = Order.objects.filter(customer=customer).order_by('-created_at')
@@ -70,10 +72,11 @@ class ProfileView(CartMixin, View):
         return render(request, 'store/profile.html', {'orders': orders, 'cart': self.cart, 'categories': categories})
 
 
-class Home(CartMixin, ListView):                       # для главной страницы
+class Home(CartMixin, ListView):
+    """Для главной страницы"""
     model = Product
     template_name = 'store/home.html'       # дефолтное название шаблона
-    context_object_name = 'products'        # дефолтное название обьекта "Product"
+    context_object_name = 'products'        # дефолтное название объекта "Product"
     allow_empty = False                     # не показывать пустой список
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -83,13 +86,14 @@ class Home(CartMixin, ListView):                       # для главной �
         return context
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True).select_related('category')
+        return Product.objects.filter(is_active=True).select_related('category').order_by('?')
 
 
-class ProductItem(CartMixin, DetailView):                  # для одного продукта
+class ProductItem(CartMixin, DetailView):
+    """Просмотр товара"""
     model = Product
-    template_name = 'store/product_item.html'   # дефолтное название шаблона
-    context_object_name = 'news_item'           # дефолтное название обьекта "Product"
+    template_name = 'store/product_item.html'               # дефолтное название шаблона
+    context_object_name = 'news_item'                       # дефолтное название объекта "Product"
     slug_url_kwarg = 'slug'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -101,13 +105,14 @@ class ProductItem(CartMixin, DetailView):                  # для одного
         return Product.objects.filter(slug=self.kwargs['slug'], is_active=True)
 
 
-class CategoryItem(CartMixin, ListView):               # для просмотра товаров одной категории
-    template_name = 'store/category.html'   # дефолтное название шаблона
-    context_object_name = 'categories'      # дефолтное название обьекта
-    allow_empty = False                     # не показывать пустой список
+class CategoryItem(CartMixin, ListView):
+    """Для просмотра товаров по категориям"""
+    template_name = 'store/category.html'           # дефолтное название шаблона
+    context_object_name = 'categories'              # дефолтное название объекта
+    allow_empty = False                             # не показывать пустой список
 
     def get_queryset(self):
-        return Product.objects.filter(category__slug=self.kwargs['slug'], is_active=True)
+        return Product.objects.filter(category__slug=self.kwargs['slug'], is_active=True).select_related('category')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,7 +122,7 @@ class CategoryItem(CartMixin, ListView):               # для просмотр
 
 
 class CartView(CartMixin, View):
-
+    """Корзина"""
     def get(self, request, *args, **kwargs):
         context = {
             'cart': self.cart,
@@ -125,7 +130,8 @@ class CartView(CartMixin, View):
         return render(request, 'store/cart.html', context)
 
 
-class AddToCartView(CartMixin, View):       # добавление товара в корзины
+class AddToCart(CartMixin, View):
+    """добавление товара в корзину"""
 
     def get(self, request, *args, **kwargs):
         product_slug = kwargs.get('slug')
@@ -139,8 +145,8 @@ class AddToCartView(CartMixin, View):       # добавление товара 
         return HttpResponseRedirect('/cart/')
 
 
-class DeleteCartView(CartMixin, View):    # удаление товара из корзины
-
+class DeleteCartView(CartMixin, View):
+    """удаление товара из корзины"""
     def get(self, request, *args, **kwargs):
         product_slug = kwargs.get('slug')
         product = Product.objects.get(slug=product_slug)
@@ -154,7 +160,7 @@ class DeleteCartView(CartMixin, View):    # удаление товара из �
 
 
 class ChangeQTY(CartMixin, View):
-
+    """ИЗМЕНЕНИЕ КОЛЬ-ВО ПРОДУКТА"""
     def post(self, request, *args, **kwargs):
         product_slug = kwargs.get('slug')
         product = Product.objects.get(slug=product_slug)
@@ -169,7 +175,7 @@ class ChangeQTY(CartMixin, View):
 
 
 class Ordering(CartMixin, View):
-
+    """Оформление заказа"""
     def get(self, request, *args, **kwargs):
         form = OrderForm(request.POST or None)
         context = {
@@ -179,8 +185,8 @@ class Ordering(CartMixin, View):
         return render(request, 'store/ordering.html', context)
 
 
-class MakeOrder(CartMixin, View):       # для обработки оформления заказа
-
+class MakeOrder(CartMixin, View):
+    """для обработки оформления заказа"""
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         form = OrderForm(request.POST or None)
@@ -209,12 +215,21 @@ class SearchView(CartMixin, ListView):
     """ поиск на сайте """
     model = Product
     template_name = 'store/product_list.html'  # дефолтное название шаблона
-    context_object_name = 'products'  # дефолтное название обьекта "Product"
+    context_object_name = 'products'  # дефолтное название объекта "Product"
     allow_empty = False
 
     def get_queryset(self):
-        query = self.request.GET.get('q')
-        products = Product.objects.filter(
-            Q(name__iregex=query)
-        )
-        return products
+        query = self.request.GET.get('query')
+        if query:
+            products = Product.objects.filter(
+                Q(name__iregex=query) | Q(description__iregex=query))
+            return products
+        else:
+            product = Product.objects.all()
+            return product
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cart'] = self.cart
+        return context
+

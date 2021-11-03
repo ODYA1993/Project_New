@@ -71,8 +71,8 @@ class Product(models.Model):
     name = models.CharField(max_length=64, blank=True, null=True, default=None, verbose_name='Наименование продукта')
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name='URL')
     description = models.TextField(blank=True, null=True, default=None, verbose_name='Описание товара')
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Цена')
-    stock = models.PositiveIntegerField(verbose_name='Коль-во товара')
+    price = models.DecimalField(max_digits=10, decimal_places=0, default=0, verbose_name='Цена')
+    # stock = models.PositiveIntegerField(verbose_name='Коль-во товара')
     discount = models.IntegerField(verbose_name='Скидка', default=0)
     image = models.ImageField(upload_to='media/', blank=True, verbose_name='Изображение')
     is_active = models.BooleanField(default=True)
@@ -99,7 +99,7 @@ class Product(models.Model):
 
 
 class CartProduct(models.Model):
-    user = models.ForeignKey(Customer, verbose_name='Покупатель', on_delete=models.CASCADE)
+    user = models.ForeignKey(Customer, null=True, verbose_name='Покупатель', on_delete=models.CASCADE)
     cart = models.ForeignKey('Cart', verbose_name='Корзина', on_delete=models.CASCADE, related_name='related_products')
     product = models.ForeignKey(Product, verbose_name='Товар', on_delete=models.CASCADE)
     qty = models.PositiveIntegerField(default=1, verbose_name='Количество')
@@ -117,7 +117,7 @@ class Cart(models.Model):
     owner = models.ForeignKey(Customer, null=True, verbose_name='Владелец', on_delete=models.CASCADE)
     products = models.ManyToManyField(CartProduct, blank=True, related_name='related_cart')
     total_products = models.PositiveIntegerField(default=0)
-    final_price = models.DecimalField(max_digits=9, default=0, decimal_places=2, verbose_name='Общая цена')
+    final_price = models.DecimalField(max_digits=9, default=0, decimal_places=0, verbose_name='Общая цена')
     in_order = models.BooleanField(default=False)
     for_anonymous_user = models.BooleanField(default=False)
 
